@@ -2,9 +2,10 @@ import { useLeaderboard } from '../hooks/useLeaderboard';
 import { LeaderboardTable } from '../components/LeaderboardTable';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { Trophy, Award, Star } from 'lucide-react';
+import { LeaderboardEntry } from '../types';
 
 export const LeaderboardPage = () => {
-  const { data: entries, isLoading, error } = useLeaderboard();
+  const { data: profiles, isLoading, error } = useLeaderboard();
 
   if (isLoading) {
     return (
@@ -25,6 +26,22 @@ export const LeaderboardPage = () => {
       </div>
     );
   }
+
+  const entries: LeaderboardEntry[] = (profiles || []).map((profile, index) => ({
+    rank: index + 1,
+    user: {
+      id: profile.id,
+      name: profile.full_name,
+      email: '', // Not available from scraper
+      kaggleUsername: profile.kaggle_username,
+      totalScore: profile.points,
+      rank: index + 1,
+      badges: [], // Not available from scraper
+    },
+    totalScore: profile.points,
+    competitionsCompleted: profile.competitions_entered,
+    badges: [], // Not available from scraper
+  }));
 
   const topThree = entries?.slice(0, 3) || [];
 
@@ -72,7 +89,7 @@ export const LeaderboardPage = () => {
 };
 
 interface TopPerformerCardProps {
-  entry: any;
+  entry: LeaderboardEntry;
   rank: number;
 }
 
